@@ -15,8 +15,12 @@ namespace LifeNotes.Profiles
         {
             CreateMap<Notes, NoteDTO>()
                 .ForMember(dest=>dest.Image,
-                opt=>opt.MapFrom(src=>src.ImageData));
-            CreateMap<NoteToCreateDTO, Notes>();
+                    opt=>opt.MapFrom(src=>src.ImageData))
+                .ForMember(dest => dest.General,
+                    opt => opt.MapFrom(src => src.Generall)) ;
+            CreateMap<NoteToCreateDTO, Notes>()
+                .ForMember(dest => dest.Generall,
+                    opt => opt.MapFrom(src => src.General));
 
 
             

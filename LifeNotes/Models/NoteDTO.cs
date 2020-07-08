@@ -14,7 +14,7 @@ namespace LifeNotes.Models
         public byte Weather { get; set; }
         public byte Mood { get; set; }
         public byte Productivity { get; set; }
-        public byte Generall { get; set; }
+        public byte General { get; set; }
         public long UserId { get; set; }
         public int Next { get; set; }
         public int Previous { get; set; }

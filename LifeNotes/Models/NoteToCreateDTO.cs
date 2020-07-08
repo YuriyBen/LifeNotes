@@ -20,7 +20,7 @@ namespace LifeNotes.Models
         [Range(1, 5)]
         public byte Productivity { get; set; }
         [Range(1, 5)]
-        public byte Generall { get; set; }
+        public byte General { get; set; }
         [Required]
         public long UserId { get; set; }
     }
