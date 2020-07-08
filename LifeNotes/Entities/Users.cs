@@ -3,23 +3,21 @@ using System.Collections.Generic;
 
 namespace LifeNotes.Entities
 {
-    public partial class UserInfo
+    public partial class Users
     {
-        public UserInfo()
+        public Users()
         {
-            Note = new HashSet<Note>();
+            Notes = new HashSet<Notes>();
         }
 
         public long Id { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
-        public byte[] ImageData { get; set; }
+        public byte[] ProfileImage { get; set; }
         public string PasswordSalt { get; set; }
         public string PasswordHash { get; set; }
-        public byte UnseccessfulAttemptsCount { get; set; }
-        public string EmailConfirmationToken { get; set; }
         public string RegistrationToken { get; set; }
 
-        public virtual ICollection<Note> Note { get; set; }
+        public virtual ICollection<Notes> Notes { get; set; }
     }
 }

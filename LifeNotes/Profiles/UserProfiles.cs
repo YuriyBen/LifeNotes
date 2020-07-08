@@ -13,11 +13,9 @@ namespace LifeNotes.Profiles
     {
         public UserProfiles()
         {
-            CreateMap< UserInfo,UserDTO>();
-            CreateMap<RegistrationDTO, UserInfo>()
-                .ForMember(dest => dest.ImageData,
-                opt => opt.MapFrom(src => src.ProfileImage));
-            CreateMap<UserInfo, UserWithTokenDTO>();
+            CreateMap< Users,UserDTO>();
+            CreateMap<RegistrationDTO, Users>();
+            CreateMap<Users, UserWithTokenDTO>();
 
 
 

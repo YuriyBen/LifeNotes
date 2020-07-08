@@ -8,17 +8,20 @@ namespace LifeNotes.Models
 {
     public class NoteToCreateDTO
     {
-        public DateTime DateInfo { get; set; } = DateTime.Now;
+        public int DateId { get; set; } = Convert.ToInt32(DateTime.UtcNow.ToString("yyyMMdd"));
+        [Required]
         public string Comment { get; set; }
         public byte[] ImageData { get; set; }
 
         [Range(1,5)]
-        public byte WeatherCriteriaRating { get; set; }
+        public byte Weather { get; set; }
         [Range(1, 5)]
-        public byte MoodCriteriaRating { get; set; }
+        public byte Mood { get; set; }
         [Range(1, 5)]
-        public byte ProductivityCriteriaRating { get; set; }
+        public byte Productivity { get; set; }
         [Range(1, 5)]
-        public byte GenerallCriteriaRating { get; set; }
+        public byte Generall { get; set; }
+        [Required]
+        public long UserId { get; set; }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace LifeNotes.Models
 {
 
-    public class UserWithTokenDTO : UserInfo
+    public class UserWithTokenDTO : Users
     {
         public string AccessToken { get; set; }
         public string RefreshToken { get; set; }

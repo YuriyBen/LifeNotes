@@ -13,14 +13,10 @@ namespace LifeNotes.Profiles
     {
         public NoteProfiles()
         {
-            CreateMap<Note, NoteDTO>()
-                .ForMember(
-                    dest => dest.OnlyDate,
-                    opt => opt.MapFrom(src => $"{src.DateInfo.ToShortDateString()}"))
-                .ForMember(
-                    dest => dest.DayOfWeek,
-                    opt => opt.MapFrom(src => src.DateInfo.DayName()));
-            CreateMap<NoteToCreateDTO, Note>();
+            CreateMap<Notes, NoteDTO>()
+                .ForMember(dest=>dest.Image,
+                opt=>opt.MapFrom(src=>src.ImageData));
+            CreateMap<NoteToCreateDTO, Notes>();
 
 
             

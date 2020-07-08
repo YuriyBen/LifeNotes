@@ -15,54 +15,44 @@ namespace LifeNotes.Entities
         {
         }
 
-        public virtual DbSet<Note> Note { get; set; }
-        public virtual DbSet<UserInfo> UserInfo { get; set; }
+        public virtual DbSet<Notes> Notes { get; set; }
+        public virtual DbSet<Users> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Name=LifeNotesDB");
+                optionsBuilder.UseSqlServer("Name=LifeNotesDb");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Note>(entity =>
+            modelBuilder.Entity<Notes>(entity =>
             {
                 entity.Property(e => e.Comment)
                     .HasMaxLength(200)
                     .IsUnicode(false);
 
-                entity.Property(e => e.DateInfo).HasColumnType("date");
-
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.Note)
+                    .WithMany(p => p.Notes)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__Note__UserId__2A4B4B5E");
+                    .HasConstraintName("FK__Notes__UserId__31EC6D26");
             });
 
-            modelBuilder.Entity<UserInfo>(entity =>
+            modelBuilder.Entity<Users>(entity =>
             {
                 entity.HasIndex(e => e.Email)
-                    .HasName("UQ__UserInfo__A9D10534AC4A3EE7")
-                    .IsUnique();
-
-                entity.HasIndex(e => e.EmailConfirmationToken)
-                    .HasName("UQ__UserInfo__F9CA6B6F09032B03")
+                    .HasName("UQ__Users__A9D105342F2BCFA0")
                     .IsUnique();
 
                 entity.HasIndex(e => e.UserName)
-                    .HasName("UQ__UserInfo__C9F284567F0FBC59")
+                    .HasName("UQ__Users__C9F2845621292A91")
                     .IsUnique();
 
                 entity.Property(e => e.Email)
                     .IsRequired()
                     .HasMaxLength(200)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.EmailConfirmationToken)
-                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.Property(e => e.PasswordHash)

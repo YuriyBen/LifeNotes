@@ -40,7 +40,7 @@ namespace LifeNotes.Controllers
                 return BadRequest(new { message = "Email or password is empty..." });
             }
             
-            string passwordSalt = _context.UserInfo.Where(x => x.Email == userClaims.Email).Select(x => x.PasswordSalt).FirstOrDefault();
+            string passwordSalt = _context.Users.Where(x => x.Email == userClaims.Email).Select(x => x.PasswordSalt).FirstOrDefault();
 
             if (passwordSalt == null)
             {
@@ -48,7 +48,7 @@ namespace LifeNotes.Controllers
             }
             string passwordHash = userClaims.Password.GenerateHash(passwordSalt);
 
-            UserInfo user = await _context.UserInfo
+            Users user = await _context.Users
                                         .FirstOrDefaultAsync(u => u.Email == userClaims.Email
                                                           && u.PasswordHash == passwordHash);
 

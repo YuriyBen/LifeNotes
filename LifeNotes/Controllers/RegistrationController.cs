@@ -31,24 +31,23 @@ namespace LifeNotes.Controllers
         [Route("api/registration")]
         public async Task<IActionResult> Registration([FromBody] RegistrationDTO user)
         {
-            if (_context.UserInfo.Any(x => x.UserName == user.Username))
+            if (_context.Users.Any(x => x.UserName == user.Username))
             {
                 return StatusCode(409, $"User '{user.Username}' is already exists.");
             }
-            if (_context.UserInfo.Any(x => x.Email == user.Email))
+            if (_context.Users.Any(x => x.Email == user.Email))
             {
                 return StatusCode(409, $"Email  '{user.Email}' is currently in use.");
             }
             try
             {
-                var userToCreate = _mapper.Map<UserInfo>(user);
+                var userToCreate = _mapper.Map<Users>(user);
 
                 string passwordSalt = user.Password.CreateSalt();
                 userToCreate.PasswordSalt = passwordSalt;
                 userToCreate.PasswordHash = user.Password.GenerateHash(passwordSalt);
-                userToCreate.EmailConfirmationToken = Guid.NewGuid().ToString();
 
-                await _context.UserInfo.AddAsync(userToCreate);
+                await _context.Users.AddAsync(userToCreate);
                 await _context.SaveChangesAsync();
                 return StatusCode(201);
 
