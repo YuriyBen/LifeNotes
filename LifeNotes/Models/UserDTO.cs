@@ -10,7 +10,7 @@ namespace LifeNotes.Models
         public long Id { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
-        public string IdToken { get; set; } //AccessToken
+        public string Token { get; set; } //AccessToken
         public int ExpiresIn { get; set; } = 3600;
 
     }

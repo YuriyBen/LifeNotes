@@ -2,6 +2,7 @@
 using LifeNotes.Entities;
 using LifeNotes.Helpers;
 using LifeNotes.Models;
+using LifeNotes.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -18,12 +19,14 @@ namespace LifeNotes.Controllers
         private readonly LifeNotesContext _context;
         private readonly JWTSettings _jwtSettings;
         private readonly IMapper _mapper;
+        private readonly IRegistrationService _registrationRepository;
 
-        public RegistrationController(LifeNotesContext context, IOptions<JWTSettings> jwtSettings, IMapper mapper)
+        public RegistrationController(LifeNotesContext context, IOptions<JWTSettings> jwtSettings, IMapper mapper, IRegistrationService registrationRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _jwtSettings = jwtSettings.Value ?? throw new ArgumentNullException(nameof(jwtSettings));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _registrationRepository= registrationRepository ?? throw new ArgumentNullException(nameof(registrationRepository));
         }
 
         [AllowAnonymous]
@@ -43,12 +46,10 @@ namespace LifeNotes.Controllers
             {
                 var userToCreate = _mapper.Map<Users>(user);
 
-                string passwordSalt = user.Password.CreateSalt();
-                userToCreate.PasswordSalt = passwordSalt;
-                userToCreate.PasswordHash = user.Password.GenerateHash(passwordSalt);
+                await _registrationRepository.SignOutUserAsync(userToCreate, user.Password);
 
-                await _context.Users.AddAsync(userToCreate);
                 await _context.SaveChangesAsync();
+
                 return StatusCode(201);
 
             }

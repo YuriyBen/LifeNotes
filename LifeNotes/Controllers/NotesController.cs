@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using LifeNotes.Entities;
 using LifeNotes.Models;
+using LifeNotes.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,20 +18,22 @@ namespace LifeNotes.Controllers
     [Route("api/notes")]
     public class NotesControllerr : ControllerBase
     {
+        private readonly INoteService _logicRepository;
         private readonly LifeNotesContext _context;
         private readonly IMapper _mapper;
 
-        public NotesControllerr(LifeNotesContext context, IMapper mapper)
+        public NotesControllerr(INoteService logicRepository, LifeNotesContext context, IMapper mapper)
         {
-            _context = context;
-            _mapper = mapper;
+            _logicRepository = logicRepository ?? throw new ArgumentNullException(nameof(logicRepository));
+            _context = context ?? throw new ArgumentNullException(nameof(context)); ;
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper)); ;
         }
         [HttpGet]
         public async Task<ActionResult<NoteDTO>> GetNoteByIDs([FromQuery] long userId, [FromQuery]int dateId)
         {
             try
             {
-                var note = await _context.Notes.FirstOrDefaultAsync(x => x.UserId == userId && x.DateId == dateId);
+                var note = await _logicRepository.GetNoteByIdsAsync(userId, dateId);
                 if (note == null)
                 {
                     return NoContent();
@@ -50,8 +53,6 @@ namespace LifeNotes.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            
-
         }
 
         [HttpPost]
@@ -60,15 +61,14 @@ namespace LifeNotes.Controllers
             try
             {
                 var note = _mapper.Map<Notes>(noteToCreate);
-                await _context.Notes.AddAsync(note);
-                await _context.SaveChangesAsync();
+                await _logicRepository.CreateNoteAsync(note);
+                await _logicRepository.SaveAsync();
                 var noteToReturn = _mapper.Map<NoteDTO>(note);
 
                 return StatusCode(201);
             }
             catch (Exception ex)
             {
-
                 return BadRequest(ex.Message);
             }
             

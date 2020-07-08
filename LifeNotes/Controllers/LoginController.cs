@@ -2,6 +2,7 @@
 using LifeNotes.Entities;
 using LifeNotes.Helpers;
 using LifeNotes.Models;
+using LifeNotes.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,57 +24,35 @@ namespace LifeNotes.Controllers
         private readonly LifeNotesContext _context;
         private readonly JWTSettings _jwtSettings;
         private readonly IMapper _mapper;
+        private readonly ILoginService _loginRepository;
 
-        public LoginController(LifeNotesContext context, IOptions<JWTSettings> jwtSettings, IMapper mapper)
+        public LoginController(LifeNotesContext context, IOptions<JWTSettings> jwtSettings, IMapper mapper,ILoginService loginRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _jwtSettings = jwtSettings.Value ?? throw new ArgumentNullException(nameof(jwtSettings));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _loginRepository=loginRepository ?? throw new ArgumentNullException(nameof(loginRepository));
         }
         [AllowAnonymous]
         [HttpPost()]
         [Route("api/login")]
         public async Task<ActionResult<UserDTO>> Login([FromBody] LoginDTO userClaims)
         {
-            if (string.IsNullOrEmpty(userClaims.Email) || string.IsNullOrEmpty(userClaims.Password))
-            {
-                return BadRequest(new { message = "Email or password is empty..." });
-            }
-            
-            string passwordSalt = _context.Users.Where(x => x.Email == userClaims.Email).Select(x => x.PasswordSalt).FirstOrDefault();
-
-            if (passwordSalt == null)
-            {
-                return BadRequest(new { message = "It seems that email doesn't exist or is incorrect..." });
-            }
-            string passwordHash = userClaims.Password.GenerateHash(passwordSalt);
-
-            Users user = await _context.Users
-                                        .FirstOrDefaultAsync(u => u.Email == userClaims.Email
-                                                          && u.PasswordHash == passwordHash);
+            Users user = _loginRepository.GetUserOrDefault(userClaims);
 
             if (user == null)
             {
                 return BadRequest(new { message = "Username or password is incorrect..." });
             }
+
             UserDTO userDTO = _mapper.Map<UserDTO>(user);
+
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, userDTO.Id.ToString())
-                }),
-                Expires = DateTime.UtcNow.AddSeconds(3600),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256Signature)
-            };
+            var token = GenerateJWT.CreateJWT(userDTO.Id,_jwtSettings.SecretKey);
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            userDTO.IdToken = tokenHandler.WriteToken(token);
-
+            userDTO.Token = tokenHandler.WriteToken(token);
             user.RegistrationToken = tokenHandler.WriteToken(token);
+
             await _context.SaveChangesAsync();
 
             return userDTO;

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using LifeNotes.Entities;
 using LifeNotes.Models;
+using LifeNotes.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -41,6 +42,10 @@ namespace LifeNotes
 
             services.AddDbContext<LifeNotesContext>(opt =>
                 opt.UseSqlServer(Configuration.GetConnectionString("LifeNotesDb")));
+
+            services.AddScoped<INoteService, NoteService>();
+            services.AddScoped<ILoginService, LoginService>();
+            services.AddScoped<IRegistrationService, RegistrationService>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
