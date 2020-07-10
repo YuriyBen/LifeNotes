@@ -29,7 +29,14 @@ namespace LifeNotes.Services
             }
             await _context.Notes.AddAsync(noteToCreate);
         }
-
+        public async Task<bool> NoteIsAlreadyExistsAsync(int dateId)
+        {
+            if(await _context.Notes.FirstOrDefaultAsync(x=>x.DateId==dateId)==null)
+            {
+                return false;
+            }
+            return true;
+        }
         public async Task<bool> SaveAsync()
         {
             return await _context.SaveChangesAsync() >= 0;

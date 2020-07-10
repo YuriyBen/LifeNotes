@@ -7,6 +7,7 @@ namespace LifeNotes.Services
     {
         Task CreateNoteAsync(Notes noteToCreate);
         Task<Notes> GetNoteByIdsAsync(long userId, int dateId);
+        Task<bool> NoteIsAlreadyExistsAsync(int dateId);
         Task<bool> SaveAsync();
     }
 }

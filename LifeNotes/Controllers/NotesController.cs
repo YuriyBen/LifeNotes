@@ -29,12 +29,19 @@ namespace LifeNotes.Controllers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper)); ;
         }
         [HttpGet]
-        public async Task<ActionResult<NoteDTO>> GetNoteByIDs([FromQuery] long userId, [FromQuery]int dateId)
+        public async Task<IActionResult/*<NoteDTO>*/> GetNoteByIDs([FromQuery] long userId, [FromQuery]int dateId)
         {
             try
             {
                 var note = await _logicRepository.GetNoteByIdsAsync(userId, dateId);
                 int dateIdToday = Int32.Parse(DateTime.UtcNow.ToString("yyyMMdd"));
+                if (note == null && dateId == dateIdToday)
+                {
+                    int Previous= _context.Notes.Where(x => x.DateId < dateId)
+                                    .Select(x => x.DateId)
+                                    .ToList().LastOrDefault();
+                    return Ok( new { Previous });
+                }
                 if (note == null && dateId!=dateIdToday)
                 {
                     return NoContent();
@@ -45,7 +52,7 @@ namespace LifeNotes.Controllers
                                     .Select(x => x.DateId).FirstOrDefaultAsync();
 
                 noteToReturn.Previous = _context.Notes.Where(x => x.DateId < dateId)
-                                    .Select(x=>x.DateId)
+                                    .Select(x => x.DateId)
                                     .ToList().LastOrDefault();
 
                 return Ok(noteToReturn);
@@ -64,7 +71,22 @@ namespace LifeNotes.Controllers
                 var note = _mapper.Map<Notes>(noteToCreate);
                 note.DateId = dateId;
                 note.UserId = userId;
-                await _logicRepository.CreateNoteAsync(note);
+                if(await _logicRepository.NoteIsAlreadyExistsAsync(dateId))
+                {
+                    //Bad choice to update!!
+                    string toUpdate = @$"UPDATE dbo.Notes 
+                                         SET Comment='{note.Comment}', Weather={note.Weather},Mood={note.Mood},
+                                         Generall={note.Generall}, Productivity={note.Productivity}
+                                         WHERE dateId = {note.DateId};";
+
+                    _context.Database.ExecuteSqlRaw(toUpdate);
+
+                }
+                else
+                {
+                    await _logicRepository.CreateNoteAsync(note);
+                }
+                
                 await _logicRepository.SaveAsync();
                 var noteToReturn = _mapper.Map<NoteDTO>(note);
 
@@ -72,7 +94,7 @@ namespace LifeNotes.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.InnerException.Message);
+                return BadRequest(ex.Message);
             }
             
         }

@@ -33,7 +33,8 @@ namespace LifeNotes.Controllers
                 int elemsToSkip = notesCount > numberOfDays ? notesCount - numberOfDays : 0;
 
                 var arrayOfNotes = _context.Notes.Where(u => u.UserId == userId).Skip(elemsToSkip).ToList();
-
+                criteria = criteria == "general" ? "generall":criteria;
+                criteria = criteria.Replace(criteria[0], Char.ToUpper(criteria[0]));
                 foreach (var item in arrayOfNotes)
                 {
                     var value = item.GetType().GetProperty(criteria).GetValue(item);
@@ -41,7 +42,7 @@ namespace LifeNotes.Controllers
                     statistics.Add(
                         new Coordinates()
                         {
-                            X = item.DateId,
+                            X = item.DateId.ToString(),
                             Y = _Y
                         });
                 }
@@ -57,7 +58,7 @@ namespace LifeNotes.Controllers
     }
     public struct Coordinates
     { 
-        public int X { get; set; } //DateId
+        public string X { get; set; } //DateId
         public int Y { get; set; } //Value
     }
 }
