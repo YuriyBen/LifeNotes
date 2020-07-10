@@ -15,10 +15,6 @@ namespace LifeNotes.Profiles
         {
             CreateMap< Users,UserDTO>();
             CreateMap<RegistrationDTO, Users>();
-            CreateMap<Users, UserWithTokenDTO>();
-
-
-
         }
     }
 }

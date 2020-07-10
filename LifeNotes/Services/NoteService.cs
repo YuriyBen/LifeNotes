@@ -31,11 +31,11 @@ namespace LifeNotes.Services
         }
         public async Task<bool> NoteIsAlreadyExistsAsync(int dateId)
         {
-            if(await _context.Notes.FirstOrDefaultAsync(x=>x.DateId==dateId)==null)
+            if(await _context.Notes.AnyAsync(x=>x.DateId==dateId))
             {
-                return false;
+                return true;
             }
-            return true;
+            return false;
         }
         public async Task<bool> SaveAsync()
         {

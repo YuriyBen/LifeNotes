@@ -29,7 +29,7 @@ namespace LifeNotes.Controllers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper)); ;
         }
         [HttpGet]
-        public async Task<IActionResult/*<NoteDTO>*/> GetNoteByIDs([FromQuery] long userId, [FromQuery]int dateId)
+        public async Task<IActionResult> GetNoteByIDs([FromQuery] long userId, [FromQuery]int dateId)
         {
             try
             {
@@ -77,7 +77,7 @@ namespace LifeNotes.Controllers
                     string toUpdate = @$"UPDATE dbo.Notes 
                                          SET Comment='{note.Comment}', Weather={note.Weather},Mood={note.Mood},
                                          Generall={note.Generall}, Productivity={note.Productivity}
-                                         WHERE dateId = {note.DateId};";
+                                         WHERE dateId = {note.DateId} AND userId={note.UserId};";
 
                     _context.Database.ExecuteSqlRaw(toUpdate);
 
