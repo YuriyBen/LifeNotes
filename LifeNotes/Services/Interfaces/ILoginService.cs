@@ -6,7 +6,6 @@ namespace LifeNotes.Services
 {
     public interface ILoginService
     {
-        Task dsf(LoginDTO userClaims);
         Users GetUserOrDefault(LoginDTO userClaims);
     }
 }

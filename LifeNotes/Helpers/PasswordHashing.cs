@@ -19,7 +19,7 @@ namespace LifeNotes.Helpers
         }
 
 
-        public static string GenerateHash( string plaintPassword, string salt)
+        public static string GenerateHash(this string plaintPassword, string salt)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(plaintPassword + salt);
             SHA256Managed sHA256ManagedString = new SHA256Managed();

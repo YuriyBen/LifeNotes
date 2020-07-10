@@ -8,7 +8,6 @@ namespace LifeNotes.Models
 {
     public class NoteToCreateDTO
     {
-        public int DateId { get; set; } = Convert.ToInt32(DateTime.UtcNow.ToString("yyyMMdd"));
         [Required]
         public string Comment { get; set; }
         public byte[] ImageData { get; set; }
@@ -21,7 +20,5 @@ namespace LifeNotes.Models
         public byte Productivity { get; set; }
         [Range(1, 5)]
         public byte General { get; set; }
-        [Required]
-        public long UserId { get; set; }
     }
 }

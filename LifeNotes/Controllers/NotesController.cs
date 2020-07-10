@@ -34,7 +34,8 @@ namespace LifeNotes.Controllers
             try
             {
                 var note = await _logicRepository.GetNoteByIdsAsync(userId, dateId);
-                if (note == null)
+                int dateIdToday = Int32.Parse(DateTime.UtcNow.ToString("yyyMMdd"));
+                if (note == null && dateId!=dateIdToday)
                 {
                     return NoContent();
                 }
@@ -56,11 +57,13 @@ namespace LifeNotes.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateNote(NoteToCreateDTO noteToCreate)
+        public async Task<IActionResult> CreateNote(NoteToCreateDTO noteToCreate,[FromQuery]long userId, [FromQuery]int dateId)
         {
             try
             {
                 var note = _mapper.Map<Notes>(noteToCreate);
+                note.DateId = dateId;
+                note.UserId = userId;
                 await _logicRepository.CreateNoteAsync(note);
                 await _logicRepository.SaveAsync();
                 var noteToReturn = _mapper.Map<NoteDTO>(note);
@@ -69,7 +72,7 @@ namespace LifeNotes.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.InnerException.Message);
             }
             
         }

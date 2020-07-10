@@ -16,13 +16,15 @@ namespace LifeNotes.Entities
         }
 
         public virtual DbSet<Notes> Notes { get; set; }
+        public virtual DbSet<TblRefreshToken> TblRefreshToken { get; set; }
         public virtual DbSet<Users> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Name=LifeNotesDb");
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseSqlServer("Data Source=localhost;Initial Catalog=LifeNotes;Integrated Security=True");
             }
         }
 
@@ -38,6 +40,26 @@ namespace LifeNotes.Entities
                     .WithMany(p => p.Notes)
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("FK__Notes__UserId__31EC6D26");
+            });
+
+            modelBuilder.Entity<TblRefreshToken>(entity =>
+            {
+                entity.HasKey(e => e.TokenId)
+                    .HasName("PK__TblRefre__658FEEEAB46A127B");
+
+                entity.Property(e => e.ExpiryDate)
+                    .HasColumnName("expiry_date")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.RefreshToken)
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.TblRefreshToken)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK__TblRefres__UserI__3C69FB99");
             });
 
             modelBuilder.Entity<Users>(entity =>

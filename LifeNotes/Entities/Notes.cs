@@ -6,7 +6,7 @@ namespace LifeNotes.Entities
     public partial class Notes
     {
         public long Id { get; set; }
-        public int DateId { get; set; } //= Convert.ToInt32(DateTime.UtcNow.ToString("yyyMMdd"));
+        public int DateId { get; set; }
         public string Comment { get; set; }
         public byte[] ImageData { get; set; }
         public byte Weather { get; set; }

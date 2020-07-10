@@ -38,9 +38,6 @@ namespace LifeNotes.Services
             return user;
         }
 
-        public async Task dsf(LoginDTO userClaims)
-        {
 
-        }
     }
 }

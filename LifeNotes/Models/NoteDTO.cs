@@ -7,7 +7,7 @@ namespace LifeNotes.Models
 {
     public class NoteDTO
     {
-        public long Id { get; set; }
+//        public long Id { get; set; }
         public string DateId { get; set; } //yyyMMdd
         public string Comment { get; set; }
         public byte[] Image { get; set; }

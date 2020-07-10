@@ -8,6 +8,7 @@ namespace LifeNotes.Entities
         public Users()
         {
             Notes = new HashSet<Notes>();
+            TblRefreshToken = new HashSet<TblRefreshToken>();
         }
 
         public long Id { get; set; }
@@ -19,5 +20,6 @@ namespace LifeNotes.Entities
         public string RegistrationToken { get; set; }
 
         public virtual ICollection<Notes> Notes { get; set; }
+        public virtual ICollection<TblRefreshToken> TblRefreshToken { get; set; }
     }
 }
