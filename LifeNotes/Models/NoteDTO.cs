@@ -16,7 +16,7 @@ namespace LifeNotes.Models
         public byte Productivity { get; set; }
         public byte General { get; set; }
         public long UserId { get; set; }
-        public int Next { get; set; }
-        public int Previous { get; set; }
+        public string Next { get; set; }
+        public string Previous { get; set; }
     }
 }

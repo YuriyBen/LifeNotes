@@ -34,13 +34,15 @@ namespace LifeNotes.Controllers
             try
             {
                 var note = await _logicRepository.GetNoteByIdsAsync(userId, dateId);
+                //return Ok(date);
                 int dateIdToday = Int32.Parse(DateTime.UtcNow.ToString("yyyMMdd"));
                 if (note == null && dateId == dateIdToday)
                 {
-                    int Previous= _context.Notes.Where(x =>x.UserId==userId && x.DateId < dateId)
+                    
+                    string Previous= _context.Notes.Where(x => x.UserId == userId && x.DateId < dateId)
                                     .Select(x => x.DateId)
-                                    .ToList().LastOrDefault();
-                    return Ok( new { Previous });
+                                    .ToList().LastOrDefault().ToString();
+                    return Ok( new { Previous,Next=0 });
                 }
                 if (note == null && dateId!=dateIdToday)
                 {
@@ -48,12 +50,22 @@ namespace LifeNotes.Controllers
                 }
                 var noteToReturn = _mapper.Map<NoteDTO>(note);
 
-                noteToReturn.Next = await _context.Notes.Where(x => x.DateId > dateId)
-                                    .Select(x => x.DateId).FirstOrDefaultAsync();
+                
+                DateTime dateToCheck = DateTime.ParseExact(note.DateId.ToString(), "yyyyMMdd", CultureInfo.InvariantCulture);
 
-                noteToReturn.Previous = _context.Notes.Where(x => x.DateId < dateId)
+                if (dateToCheck.AddDays(1).ToString("yyyMMdd") == dateIdToday.ToString())
+                {
+                    noteToReturn.Next = DateTime.UtcNow.ToString("yyyMMdd");
+                }
+                else
+                {
+                    noteToReturn.Next = _context.Notes.Where(x => x.UserId == userId && x.DateId > dateId)
+                                    .Select(x => x.DateId).FirstOrDefault().ToString();
+                }
+
+                noteToReturn.Previous = _context.Notes.Where(x => x.UserId == userId && x.DateId < dateId)
                                     .Select(x => x.DateId)
-                                    .ToList().LastOrDefault();
+                                    .ToList().LastOrDefault().ToString();
 
                 return Ok(noteToReturn);
             }
