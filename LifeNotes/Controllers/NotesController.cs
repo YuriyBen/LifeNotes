@@ -37,7 +37,7 @@ namespace LifeNotes.Controllers
                 int dateIdToday = Int32.Parse(DateTime.UtcNow.ToString("yyyMMdd"));
                 if (note == null && dateId == dateIdToday)
                 {
-                    int Previous= _context.Notes.Where(x => x.DateId < dateId)
+                    int Previous= _context.Notes.Where(x =>x.UserId==userId && x.DateId < dateId)
                                     .Select(x => x.DateId)
                                     .ToList().LastOrDefault();
                     return Ok( new { Previous });
