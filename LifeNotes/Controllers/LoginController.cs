@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -25,19 +26,21 @@ namespace LifeNotes.Controllers
         private readonly JWTSettings _jwtSettings;
         private readonly IMapper _mapper;
         private readonly ILoginService _loginRepository;
+        private const int _expiryTimeSeconds = 3600;
 
-        public LoginController(LifeNotesContext context, IOptions<JWTSettings> jwtSettings, IMapper mapper,ILoginService loginRepository)
+        public LoginController(LifeNotesContext context, IOptions<JWTSettings> jwtSettings, IMapper mapper, ILoginService loginRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _jwtSettings = jwtSettings.Value ?? throw new ArgumentNullException(nameof(jwtSettings));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _loginRepository=loginRepository ?? throw new ArgumentNullException(nameof(loginRepository));
+            _loginRepository = loginRepository ?? throw new ArgumentNullException(nameof(loginRepository));
         }
         [AllowAnonymous]
         [HttpPost()]
         [Route("api/login")]
         public async Task<ActionResult<UserDTO>> Login([FromBody] LoginDTO userClaims)
         {
+            DealingWithRefreshToken dealingWithRefreshToken = new DealingWithRefreshToken();
             Users user = _loginRepository.GetUserOrDefault(userClaims);
 
             if (user == null)
@@ -47,15 +50,20 @@ namespace LifeNotes.Controllers
 
             UserDTO userDTO = _mapper.Map<UserDTO>(user);
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var token = GenerateJWT.CreateJWT(userDTO.Id,_jwtSettings.SecretKey);
+            TblRefreshToken refreshToken = dealingWithRefreshToken.GenerateRefreshToken(_expiryTimeSeconds);
+            user.TblRefreshToken.Add(refreshToken);
 
-            userDTO.Token = tokenHandler.WriteToken(token);
-            user.RegistrationToken = tokenHandler.WriteToken(token);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            string accessToken = GenerateJWT.CreateJWT(userDTO.Id, _jwtSettings.SecretKey, DateTime.UtcNow.AddSeconds(_expiryTimeSeconds));
+
+            userDTO.RefreshToken = refreshToken.RefreshToken;
+            userDTO.Token = accessToken;
+            user.RegistrationToken = accessToken;
 
             await _context.SaveChangesAsync();
 
             return userDTO;
+
         }
     }
 }

@@ -88,9 +88,12 @@ namespace LifeNotes
 
             app.UseHttpsRedirection();
 
-            app.UseRouting();
 
             app.UseCors("LifeNotes");
+
+            app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

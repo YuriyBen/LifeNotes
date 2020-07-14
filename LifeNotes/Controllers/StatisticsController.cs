@@ -1,4 +1,5 @@
 ﻿using LifeNotes.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace LifeNotes.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/statistics")]
     public class StatisticsController : ControllerBase
@@ -23,36 +25,30 @@ namespace LifeNotes.Controllers
 
 
         [HttpGet]
-        public IActionResult GetStatistics( [FromQuery] long userId, [FromQuery] string criteria, [FromQuery] int numberOfDays )
+        public IActionResult GetStatistics([FromQuery] long userId, [FromQuery] string criteria, [FromQuery] int numberOfDays)
         {
-            try
-            {
-                List<Coordinates> statistics = new List<Coordinates>();
+            List<Coordinates> statistics = new List<Coordinates>();
 
-                int notesCount = _context.Notes.ToList().Count;
-                int elemsToSkip = notesCount > numberOfDays ? notesCount - numberOfDays : 0;
+            int notesCount = _context.Notes.ToList().Count;
+            int elemsToSkip = notesCount > numberOfDays ? notesCount - numberOfDays : 0;
 
-                var arrayOfNotes = _context.Notes.Where(u => u.UserId == userId).Skip(elemsToSkip).ToList();
-                criteria = criteria == "general" ? "generall":criteria;
-                criteria = criteria.Replace(criteria[0], Char.ToUpper(criteria[0]));
-                foreach (var item in arrayOfNotes)
-                {
-                    var value = item.GetType().GetProperty(criteria).GetValue(item);
-                    int _Y = Convert.ToInt32(value);
-                    statistics.Add(
-                        new Coordinates()
-                        {
-                            X = item.DateId.ToString(),
-                            Y = _Y
-                        });
-                }
-                return Ok(statistics);
-            }
-            catch (Exception ex)
+            var arrayOfNotes = _context.Notes.Where(u => u.UserId == userId).Skip(elemsToSkip).ToList();
+            criteria = criteria == "general" ? "generall" : criteria;
+            criteria = criteria.Replace(criteria[0], Char.ToUpper(criteria[0]));
+            foreach (var item in arrayOfNotes)
             {
-                return BadRequest(ex.Message);
+                var value = item.GetType().GetProperty(criteria).GetValue(item);
+                int _Y = Convert.ToInt32(value);
+                statistics.Add(
+                    new Coordinates()
+                    {
+                        X = item.DateId.ToString(),
+                        Y = _Y
+                    });
             }
-            
+            return Ok(statistics);
+
+
         }
         
     }

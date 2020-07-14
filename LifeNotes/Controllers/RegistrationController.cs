@@ -36,11 +36,11 @@ namespace LifeNotes.Controllers
         {
             if (_context.Users.Any(x => x.UserName == user.Username))
             {
-                return StatusCode(409, $"User '{user.Username}' is already exists.");
+                return StatusCode(409,new {message= $"User '{user.Username}' is already exists." });
             }
             if (_context.Users.Any(x => x.Email == user.Email))
             {
-                return StatusCode(409, $"Email  '{user.Email}' is currently in use.");
+                return StatusCode(409, new { message = $"Email  '{user.Email}' is currently in use." });
             }
             try
             {

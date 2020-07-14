@@ -14,7 +14,7 @@ namespace LifeNotes.Helpers
     public static class GenerateJWT
     {
        
-        public static SecurityToken CreateJWT(long userId,string _secretKey)
+        public static string CreateJWT(long userId,string _secretKey,DateTime expireTime)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_secretKey);
@@ -24,13 +24,13 @@ namespace LifeNotes.Helpers
                 {
                     new Claim(ClaimTypes.Name, userId.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddSeconds(3600),
+                Expires =expireTime,// DateTime.UtcNow.AddSeconds(expiryTimeSeconds),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            return token;
+            return tokenHandler.WriteToken(token);
+           
         }
     }
 }

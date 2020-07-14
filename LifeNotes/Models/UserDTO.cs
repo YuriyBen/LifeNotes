@@ -11,7 +11,7 @@ namespace LifeNotes.Models
         public string UserName { get; set; }
         public string Email { get; set; }
         public string Token { get; set; } //AccessToken
-        public int ExpiresIn { get; set; } = 3600;
+        public string RefreshToken { get; set; } 
 
     }
 }
